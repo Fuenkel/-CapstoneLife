@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!181963792 &2655988077585873504
+Preset:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Dialogue
+  m_TargetType:
+    m_NativeTypeID: 114
+    m_ManagedTypePPtr: {fileID: 11500000, guid: 2f067b942281d9d43a73997715f131c2,
+      type: 3}
+    m_ManagedTypeFallback: 
+  m_Properties:
+  - target: {fileID: 0}
+    propertyPath: m_Enabled
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_EditorHideFlags
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_EditorClassIdentifier
+    value: 
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: NodeID
+    value: -1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: dialogueTitle
+    value: "\uD504\uB864\uB85C\uADF81"
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: description.Array.size
+    value: 4
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: description.Array.data[0]
+    value: "\uC548\uB155 ~???"
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: description.Array.data[1]
+    value: "\uBC18\uAC00\uC6CC "
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: description.Array.data[2]
+    value: "\uB098\uB294 \uC544\uC774\uC57C"
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: description.Array.data[3]
+    value: "\uD558\uC774\uC601 ~"
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: nextNODE
+    value: 
+    objectReference: {fileID: 11400000, guid: 59d1f18af69d03f47be7530916bf0b2f, type: 2}
