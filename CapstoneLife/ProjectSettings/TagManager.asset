@@ -3,11 +3,7 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags:
-  - NPC
-  - NPC2
-  - MapID
-  - Warp
+  tags: []
   layers:
   - Default
   - TransparentFX
@@ -18,8 +14,8 @@ TagManager:
   - 
   - 
   - NoPassing
-  - Joystick
-  - MapID
+  - 
+  - 
   - 
   - 
   - 
@@ -65,7 +61,4 @@ TagManager:
     locked: 0
   - name: Dialogue
     uniqueID: 2478825317
-    locked: 0
-  - name: FadeOut
-    uniqueID: 1530759173
     locked: 0

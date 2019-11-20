@@ -54,7 +54,7 @@ public class CameraManager : MonoBehaviour
     {
         // 기본셋팅
         theCamera = GetComponent<Camera>();
-         minBound = bound.bounds.min;
+        minBound = bound.bounds.min;
         maxBound = bound.bounds.max;
         halfHeight = theCamera.orthographicSize;
         halfWidth = halfHeight * Screen.width / Screen.height;

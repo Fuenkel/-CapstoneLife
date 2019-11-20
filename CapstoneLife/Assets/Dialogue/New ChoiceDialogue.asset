@@ -15,17 +15,8 @@ MonoBehaviour:
   NodeID: -1
   dialogueTitle: 
   _ChoiceMsg1: 
-  _NextChoice1Node:
-    _NextNode: {fileID: 0}
-    _ChoiceNode: {fileID: 0}
-    _flow: 0
+  _NextChoice1Node: {fileID: 0}
   _ChoiceMsg2: 
-  _NextChoice2Node:
-    _NextNode: {fileID: 0}
-    _ChoiceNode: {fileID: 0}
-    _flow: 0
+  _NextChoice2Node: {fileID: 0}
   _ChoiceMsg3: 
-  _NextChoice3Node:
-    _NextNode: {fileID: 0}
-    _ChoiceNode: {fileID: 0}
-    _flow: 0
+  _NextChoice3Node: {fileID: 0}

@@ -2,373 +2,148 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Linq;
+using System;
 using HJ.Dialogue;
-using HJ.NPC;
+using UniRx;
 using DG.Tweening;
-namespace HJ.Manager
+using Sirenix.OdinInspector;
+using System.Linq;
+public class DialogueManager : MonoBehaviour
 {
+    #region 싱글턴
+    private static DialogueManager instance;
+    public static DialogueManager Instance{
+        get{return instance;}
+        set{instance = value;}
+    }
     
-    public class DialogueManager : Singleton<DialogueManager>
-    {
-        #region Delegate
-        public delegate void ClickDelegate(int n);                          //? 클릭이벤트
-        public delegate void ChangeTextDelegate(Text t, string s);  //? 택스트 변경 이벤트
-        #endregion
+    void Awake(){
+        if(instance == null) instance = this;
+        else if(instance != this) Destroy(gameObject);
 
-        #region EVENT
-        private event ClickDelegate OnEvent_ClickButton;
-        private event ChangeTextDelegate OnEvent_ChangeText;
-        #endregion
+        DontDestroyOnLoad(gameObject);
+    }
+    #endregion
 
-        #region Variables
-        //? Dialogue UI Variables
-        public GameObject _DialogueBox;
+    #region 유틸리티
+    private string tap1 = "GameObject";
+    private string tap2 = "TEXT & IMAGE";
+    #endregion
 
-        public Text _DialogueText;
-        public GameObject[] _PlayerFace;
+    #region 변수선언
+    [TabGroup("$tap1")]
+    public GameObject _MessagePanel;
+    
+    [TabGroup("$tap1")]
+    public GameObject[] _PlayerBox;
 
-        //? Choice UI Variables
-        public GameObject _ChoiceBox;
-
-        public Text _ChoiceMainText;
-        public Text _ChoiceText1;
-        public Text _ChoiceText2;
-        public Text _ChoiceText3;
-
-        //? Component Script
-        [HideInInspector]
-        public ComponentDialogueShow _componentDialogue;
+    [TabGroup("$tap1")]
+    public GameObject _BackGround;
 
 
-        public static bool is_Msg = false;     //! 대화중인가?
-        public static bool is_keypad = true;  //! 방향키 이동 가능한가?
-        public static bool is_nextmsg = false;  //! 다음 대화 내용 있나?
-        private static bool is_choice = false;  //! 선택창이 떳는가?
+    [TabGroup("$tap2")]
+    public Text _MessageText;
+    
+    [SerializeField]
+    private Image[] _PlayerImage;
+    #endregion
 
-        public Queue<string> _msgDialogueList = new Queue<string>();
-        private Queue<float> _msgtimer = new Queue<float>();
-        public List<string> _choiceList = new List<string>();
+    private Queue<string> _MsgQueue;
+    private Queue<Sprite> _ImageQueue;
 
-        private int _count = 0;
-        private string _m;
-        private string _msgTitle;
 
-        private Dialogue.Dialogue tempdb;
-        private Dialogue.ChoiceDialogue tempchoicedb;
+    void Start(){
+        InitGame();
+    }
 
-        #endregion
+    void InitGame(){
+        //? Null 값이 아닌 Box 찾기
+        var _ImageTemp = 
+            from  box in _PlayerBox
+            where box != null
+            select box;
 
-        /// <summary>
-        /// 초기화
-        /// </summary>
-        private void Awake()
+        var subject = new Subject<int>();
+        
+        //? 이미지 생성
+        _PlayerImage = new Image[_ImageTemp.Count()];
+        
+
+        //? 비동기적 서브젝트 작동
+        subject.Subscribe(x => {
+            _PlayerImage[x] = _ImageTemp.ElementAt(x).GetComponentInChildren<Image>();
+        },
+        _ => Debug.LogError("Subject ERROR"));
+        
+        
+        for(int i = 0; i < _ImageTemp.Count(); i++)
         {
-            if (_DialogueText != null) _DialogueText.text = "";
-
-            // 이벤트 등록
-            OnEvent_ClickButton += OnClickNumber;
-            OnEvent_ClickButton += OnClickEvent;
-            OnEvent_ChangeText += ChangeText;
-        }
-
-        /// <summary>
-        /// 다이얼로그 파일 불러오기
-        /// </summary>
-        public void LoadDialogue(Dialogue.Dialogue db)
-        {
-            _msgDialogueList.Clear();       //! 청소
-            _msgtimer.Clear();
-            _msgTitle = null;
-            tempdb = null;
-            _count = 0;
-            var n =
-                from set in db.setting
-                where set.description != null
-                select set.description;
-
-            for (int m = 0; m < db.setting.Length; m++){
-                _msgtimer.Enqueue(db.setting[m].descriptionTime);
-            }
-
-            foreach (var msg in n)
-            {
-                _msgDialogueList.Enqueue(msg);
-            }
-            _msgTitle = db.dialogueTitle;
-            tempdb = db;
-            Debug.Log(string.Format("Load Dialogue : {0}" ,_msgDialogueList.Count));
-        }
-
-        public void LoadChoiceDialogue(ChoiceDialogue db)
-        {
-            _choiceList.Clear();
-            _msgTitle = null;
-            tempchoicedb = null;
-            List<string> s = db.ChoiceMsgList;
-            if(s.Count >= 1)
-            {
-                _msgTitle = db.dialogueTitle;
-                for (int i = 0; i < s.Count; i++)
-                {
-                    _choiceList.Add(s[i]);
-                }
-                tempchoicedb = db;
-            }
-        }
-
-        public void NextButton()
-        {
-            if(is_Msg)
-            {
-                
-                _DialogueText.DOKill();
-                _DialogueText.text = "";
-                _DialogueText.text = _m;
-                is_Msg = false;
-                if(is_nextmsg)
-                {
-                    StartCoroutine(ShowDialogue());
-                }
-            }
-            else if(is_nextmsg)
-            {
-                StartCoroutine(ShowDialogue());
-            }
-
-            
-        }
-
-        /// <summary>
-        /// 다이얼로그 보여주기
-        /// </summary>
-        public void SetDialogue()
-        {
-            StartCoroutine(ShowDialogue());
-        }
-        /// <summary>
-        /// 선택창 보여주기
-        /// </summary>
-        public void SetChoiceDialogue()
-        {
-            StartCoroutine(ShowChoiceDialogue());
-        }
-
-        /// <summary>
-        /// 다이얼로그 보여주기
-        /// </summary>
-        /// <returns>다이얼로그 에셋</returns>
-        public IEnumerator ShowDialogue()
-        {
-           
-            float t;
-            is_Msg = true;
-            is_nextmsg = true;
-
-            if (_msgDialogueList.Count <= 0 || _msgtimer.Count <= 0)
-            {
-                //Debug.LogError(_msgDialogueList.Count +" " + _msgtimer.Count);
-
-                switch(tempdb.nextNODE._flow)
-                {
-                    case FlowNode.FLOW.DIALOGUE:
-                        //? 다음 노드가 다이얼로그 인 경우
-                        if(tempdb.nextNODE._NextNode != null)
-                        {
-                            LoadDialogue(tempdb.nextNODE._NextNode);
-
-                            StartCoroutine(ShowDialogue());
-                            yield break;
-                        }
-                        
-                        
-                        break;
-                    case FlowNode.FLOW.CHOICEDIALOGUE:
-                        //? 다음 노드가 선택로그 인 경우
-                        if (tempdb.nextNODE._ChoiceNode != null)
-                        {
-                            LoadChoiceDialogue(tempdb.nextNODE._ChoiceNode);
-
-                            StartCoroutine(ShowChoiceDialogue());
-                            yield break;
-                        }
-
-                        break;
-                }
-                /*
-                if(tempdb.subEvnet.GetPersistentEventCount() > 0)
-                    tempdb.subEvnet.Invoke();
-                    */
-                is_keypad = true;
-                is_Msg = false;
-                is_nextmsg = false;
-                HideDialogueObject();     //? 오브젝트 비활성화
-
-                yield break;
-                
-            }
-
-            ShowDialogueObject();   //? 오브젝트 표시
-            t = _msgtimer.Dequeue();
-            _m = _msgDialogueList.Dequeue();
-            _DialogueText.text = "";
-            _DialogueText.DOText(_m,t);
-            yield return new WaitForSeconds(t + 0.7f);
-            _m = null;
-            is_Msg = false;
+            subject.OnNext(i);
         }
         
-        /// <summary>
-        /// 선택창 보여주기
-        /// </summary>
-        /// <returns>선택창 에셋</returns>
-        public IEnumerator ShowChoiceDialogue()
-        {
-            int cnt = _choiceList.Count;
-            
-            is_choice = false;
-            is_Msg = true;
+        subject.OnCompleted();
 
+        Debug.Log(_ImageTemp.Count());
 
-            //? 선택창 뛰우기
-            ShowChoiceDialogueObject();
-
-            //? 이벤트 실행 : 텍스트 변경
-            OnEvent_ChangeText(_ChoiceMainText, tempchoicedb.dialogueTitle);
-            OnEvent_ChangeText(_ChoiceText1, _choiceList[0]);
-            OnEvent_ChangeText(_ChoiceText2, _choiceList[1]);
-            OnEvent_ChangeText(_ChoiceText3, _choiceList[2]);
-
-            yield return new WaitForSeconds(2f);
-            is_choice = true;
-
-            
-
-            
-            yield return null;
-        }
-
-        #region 다이얼로그창
-        void ShowDialogueObject()
-        {
-            _DialogueBox.SetActive(true);
-            _DialogueBox.transform.DOShakeScale(0.2f, 0.2f, 8);
-            _DialogueText.text = "";
-        }
-
-        void HideDialogueObject()
-        {
-            _DialogueBox.transform.DOShakeScale(1f, 0.5f, 8);
-            _DialogueText.text = "";
-            _DialogueBox.SetActive(false);
-        }
-
-        void ShowChoiceDialogueObject()
-        {
-            _ChoiceBox.transform.DOShakeScale(0.2f, 0.2f, 8);
-            _ChoiceBox.SetActive(true);
-            _ChoiceMainText.text = "";
-            _ChoiceText1.text = "";
-            _ChoiceText2.text = "";
-            _ChoiceText3.text = "";
-        }
-
-        void HideChoiceDialogueObject()
-        {
-            _ChoiceBox.transform.DOShakeScale(0.2f, 0.2f, 8);
-            _ChoiceBox.SetActive(false);
-            _ChoiceMainText.text = "";
-            _ChoiceText1.text = "";
-            _ChoiceText2.text = "";
-            _ChoiceText3.text = "";
-        }
-        void ChangeText(Text t,string s)
-        {
-            t.DOText(s, 1.6f);
-        }
-        #endregion
-
-        //? Choice 선택
-        public void Choice1()
-        {
-            if (is_choice)
-            {
-                OnEvent_ClickButton(1);
-                HideChoiceDialogueObject();
-            }
-            else
-            {
-                Debug.Log("Button SEtting Waitting....");
-            }
-        }
-        public void Choice2()
-        {
-            if (is_choice)
-            {
-                OnEvent_ClickButton(2);
-                HideChoiceDialogueObject();
-            }
-            else
-            {
-                Debug.Log("Button SEtting Waitting....");
-            }
-        }
-        public void Choice3()
-        {
-            if (is_choice)
-            {
-                OnEvent_ClickButton(3);
-                HideChoiceDialogueObject();
-            }
-            else
-            {
-                Debug.Log("Button SEtting Waitting....");
-            }
-        }
-
-        void OnClickNumber(int n)
-        {
-            FlowNode node = null;
-            if (n == 1) node = tempchoicedb._NextChoice1Node;
-            else if (n == 2) node = tempchoicedb._NextChoice2Node;
-            else if (n == 3) node = tempchoicedb._NextChoice3Node;
-            else
-            {
-                Debug.LogError("OnClickNumber Method Node null");
-                return;
-            }
-
-            switch (node._flow)
-            {
-                case FlowNode.FLOW.DIALOGUE:
-                    LoadDialogue(node._NextNode);
-                    tempchoicedb = null;
-                    StartCoroutine(ShowDialogue());
-                    break;
-                case FlowNode.FLOW.CHOICEDIALOGUE:
-                    LoadChoiceDialogue(node._ChoiceNode);
-                    StartCoroutine(ShowChoiceDialogue());
-                    break;
-            }
-                    
-             
-
-            is_Msg = false;
-            is_choice = false;
-        }
-
-        void OnClickEvent(int n)
-        {
-            /*
-            if (n == 1 ) tempchoicedb.subevent1.Invoke();
-            else if (n == 2 && tempchoicedb.subevent2.GetPersistentEventCount() > 0) tempchoicedb.subevent2.Invoke();
-            else if (n == 3 && tempchoicedb.subevent3.GetPersistentEventCount() > 0) tempchoicedb.subevent3.Invoke();
-            else
-            {
-                Debug.LogError("OnClickEvent NULL");
-                return;
-            }
-            */
-        }
+        StartCoroutine(HideObject());
     }
+
+    public void LoadDialogue(Dialogue db){
+        if(db == null) return;
+        _MsgQueue = new Queue<string>();
+        _ImageQueue = new Queue<Sprite>();
+
+        _MsgQueue.Clear();
+        _ImageQueue.Clear();
+        
+        //? Null 값이 아닌 Dialogue안의  Setting 클래스 찾기
+        var msg = 
+        from n in db.setting
+        where n != null
+        select n;
+
+        foreach(var temp in msg){
+            _MsgQueue.Enqueue(temp.description);
+            _ImageQueue.Enqueue(temp.description_Image);
+        }
+
+        Debug.Log(_MsgQueue.Count);
+
+        
+    }
+
+    IEnumerator HideObject(){
+        
+        WaitForSeconds timer = new WaitForSeconds(1f);
+
+        _BackGround.GetComponent<Image>().DOFade(0f,0.5f);
+        _MessagePanel.GetComponent<Image>().DOFade(0f,0.5f);
+        _MessageText.text ="";
+        yield return timer;
+
+        _BackGround.SetActive(false);
+        _MessagePanel.SetActive(false);
+        
+        for(int i = 0 ; i < _PlayerBox.Length; i++)
+            if(_PlayerBox[i] != null)
+                _PlayerBox[i].SetActive(false);
+    }
+
+    IEnumerator ShowObject(){
+        WaitForSeconds timer = new WaitForSeconds(1f);
+
+        _BackGround.SetActive(true);
+        _MessagePanel.SetActive(true);
+        _BackGround.GetComponent<Image>().DOFade(1f,0.5f);
+        _MessagePanel.GetComponent<Image>().DOFade(1f,0.5f);
+        yield return timer;
+
+        
+    }
+
+    void ShowText(string _msg ="", Sprite _img = null, int _petton = 0)
+    {
+        
+    }
+    
 }

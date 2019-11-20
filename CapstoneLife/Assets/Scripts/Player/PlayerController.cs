@@ -3,19 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
 using UniRx.Triggers;
-using HJ.Manager;
-public class PlayerController : Singleton<PlayerController>
+public class PlayerController : MonoBehaviour
 {
-
-    public JoyStick joystick;
-
-    public GameObject _Joypad;  //? 조이패드
-
-    public bool is_Joystick = true;
+    public static PlayerController instance;
 
     //? 플레이어 이동속도
     public float Speed { get { return speed; } set { speed = value; } }
+    public float RunSpeed { get { return runspeed; } set { runspeed = value; } }
     float vertical, horizontal;
+
+    bool is_applyRunFlag = false;      //? 뛰어가기
     bool is_canMove = true;            //? 이동가능?
 
 
@@ -34,7 +31,17 @@ public class PlayerController : Singleton<PlayerController>
     Animator _PlayerAnimator;
     private void Awake()
     {
-        
+        #region 싱글턴
+        if (instance == null)
+        {
+            DontDestroyOnLoad(this.gameObject);
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+        #endregion
 
 
     }
@@ -44,7 +51,7 @@ public class PlayerController : Singleton<PlayerController>
     private void Start()
     {
         //!? 플레이어 이동속도 설정
-        Speed = 0.1f;
+        Speed = 0.25f;
 
         _PlayerBoxColider2D = GetComponent<BoxCollider2D>();
         _PlayerAnimator = GetComponent<Animator>();
@@ -71,20 +78,10 @@ public class PlayerController : Singleton<PlayerController>
     
     private void Update()
     {
-        if(!is_Joystick)    // 키보드
-        {
-            vertical = Input.GetAxisRaw("Vertical");
-            horizontal = Input.GetAxisRaw("Horizontal");
-        }
-        else  // 조이스틱
-        {
-            vertical = joystick.GetVerticalValue();
-            horizontal = joystick.GetHorizontalValue();
-        }
+        vertical = Input.GetAxisRaw("Vertical");
+        horizontal = Input.GetAxisRaw("Horizontal");
 
-        
-
-        if (is_canMove && DialogueManager.is_keypad && !DialogueManager.is_Msg)
+        if(is_canMove)
         {
             if(horizontal != 0 || vertical != 0)
             {
@@ -98,11 +95,20 @@ public class PlayerController : Singleton<PlayerController>
     {
         while(vertical != 0 || horizontal != 0)
         {
-            
+            if(Input.GetKey(KeyCode.LeftShift))
+            {
+                RunSpeed = 2f;
+                is_applyRunFlag = true;
+            }
+            else
+            {
+                RunSpeed = 0f;
+                is_applyRunFlag = false;
+            }
+
             _PlayerVector.Set(horizontal, vertical);
-            _PlayerVector.Normalize();
-            //Debug.Log(_PlayerVector);
-            //if (_PlayerVector.x != 0) _PlayerVector.y = 0;
+
+            if (_PlayerVector.x != 0) _PlayerVector.y = 0;
 
             _PlayerAnimator.SetFloat("DirX", _PlayerVector.x);
             _PlayerAnimator.SetFloat("DirY", _PlayerVector.y);
@@ -119,14 +125,13 @@ public class PlayerController : Singleton<PlayerController>
 
             if(hit.transform != null)
             {
-               
                 break;
             }
-            Debug.Log(hit.transform);
+
             while(currentWalkCount < walkCount)
             {
                 transform.Translate(_PlayerVector.x * (speed + runspeed), _PlayerVector.y * (speed + runspeed), 0);
-               // if (is_applyRunFlag) currentWalkCount++;
+                if (is_applyRunFlag) currentWalkCount++;
                 currentWalkCount++;
                 yield return new WaitForSeconds(0.01f);
             }
