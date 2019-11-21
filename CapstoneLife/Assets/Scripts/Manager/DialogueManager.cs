@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using System.Linq;
 using HJ.Dialogue;
 using HJ.NPC;
+using System;
 using DG.Tweening;
 namespace HJ.Manager
 {
@@ -36,6 +37,10 @@ namespace HJ.Manager
         public Text _ChoiceText2;
         public Text _ChoiceText3;
 
+        //? 알람
+        public Text _Alerm;
+
+
         //? Component Script
         [HideInInspector]
         public ComponentDialogueShow _componentDialogue;
@@ -45,7 +50,7 @@ namespace HJ.Manager
         public static bool is_keypad = true;  //! 방향키 이동 가능한가?
         public static bool is_nextmsg = false;  //! 다음 대화 내용 있나?
         private static bool is_choice = false;  //! 선택창이 떳는가?
-
+        private static bool is_Wait = false;    //! 대기중 인가?
         public Queue<string> _msgDialogueList = new Queue<string>();
         private Queue<float> _msgtimer = new Queue<float>();
         public List<string> _choiceList = new List<string>();
@@ -68,7 +73,6 @@ namespace HJ.Manager
 
             // 이벤트 등록
             OnEvent_ClickButton += OnClickNumber;
-            OnEvent_ClickButton += OnClickEvent;
             OnEvent_ChangeText += ChangeText;
         }
 
@@ -169,7 +173,12 @@ namespace HJ.Manager
             {
                 //Debug.LogError(_msgDialogueList.Count +" " + _msgtimer.Count);
 
-                switch(tempdb.nextNODE._flow)
+                //? 이벤트 실행
+                if(tempdb.subEvnet.Length > 0)
+                    StartCoroutine(PlayEvent(0));
+                
+
+                switch (tempdb.nextNODE._flow)
                 {
                     case FlowNode.FLOW.DIALOGUE:
                         //? 다음 노드가 다이얼로그 인 경우
@@ -199,10 +208,15 @@ namespace HJ.Manager
                 if(tempdb.subEvnet.GetPersistentEventCount() > 0)
                     tempdb.subEvnet.Invoke();
                     */
+
+               
+
                 is_keypad = true;
                 is_Msg = false;
                 is_nextmsg = false;
                 HideDialogueObject();     //? 오브젝트 비활성화
+
+               
 
                 yield break;
                 
@@ -294,6 +308,7 @@ namespace HJ.Manager
             if (is_choice)
             {
                 OnEvent_ClickButton(1);
+                
                 HideChoiceDialogueObject();
             }
             else
@@ -306,6 +321,7 @@ namespace HJ.Manager
             if (is_choice)
             {
                 OnEvent_ClickButton(2);
+                   
                 HideChoiceDialogueObject();
             }
             else
@@ -318,6 +334,7 @@ namespace HJ.Manager
             if (is_choice)
             {
                 OnEvent_ClickButton(3);
+                   
                 HideChoiceDialogueObject();
             }
             else
@@ -338,6 +355,27 @@ namespace HJ.Manager
                 return;
             }
 
+            //? 이벤트 실행
+            switch (n)
+            {
+                case 1:
+                    //? 이벤트 실행
+                    if (tempchoicedb.subevent1.Length > 0)
+                        StartCoroutine(PlayEvent(1));
+                    break;
+                case 2:
+                    //? 이벤트 실행
+                    if (tempchoicedb.subevent2.Length > 0)
+                        StartCoroutine(PlayEvent(2));
+                    break;
+                case 3:
+                    //? 이벤트 실행
+                    if (tempchoicedb.subevent3.Length > 0)
+                        StartCoroutine(PlayEvent(3));
+                    break;
+            }
+
+
             switch (node._flow)
             {
                 case FlowNode.FLOW.DIALOGUE:
@@ -357,18 +395,92 @@ namespace HJ.Manager
             is_choice = false;
         }
 
-        void OnClickEvent(int n)
+        //? 이벤트 시작 코루틴
+        IEnumerator PlayEvent(int n)
         {
-            /*
-            if (n == 1 ) tempchoicedb.subevent1.Invoke();
-            else if (n == 2 && tempchoicedb.subevent2.GetPersistentEventCount() > 0) tempchoicedb.subevent2.Invoke();
-            else if (n == 3 && tempchoicedb.subevent3.GetPersistentEventCount() > 0) tempchoicedb.subevent3.Invoke();
-            else
+            switch(n)
             {
-                Debug.LogError("OnClickEvent NULL");
-                return;
+                case 0:     // Dialogue
+                    for (int i = 0; i < tempdb.subEvnet.Length; i++)
+                    {
+                        while (is_Wait)
+                        {
+                            yield return null;
+                        }
+                        EventPageManager.Instance.OnPlay(tempdb.subEvnet[i]);
+                    }
+                    break;
+                case 1:     // Choice 1
+                    for (int i = 0; i < tempchoicedb.subevent1.Length; i++)
+                    {
+                        while(is_Wait)
+                        {
+                            yield return null;
+                        }
+                        EventPageManager.Instance.OnPlay(tempchoicedb.subevent1[i]);
+                    }
+                    break;
+                case 2:     // Choice2
+                    for (int i = 0; i < tempchoicedb.subevent2.Length; i++)
+                    {
+                        while (is_Wait)
+                        {
+                            yield return null;
+                        }
+                        EventPageManager.Instance.OnPlay(tempchoicedb.subevent2[i]);
+                    }
+                    break;
+                case 3:     // Choice 3
+                    for (int i = 0; i < tempchoicedb.subevent3.Length; i++)
+                    {
+                        while (is_Wait)
+                        {
+                            yield return null;
+                        }
+                        EventPageManager.Instance.OnPlay(tempchoicedb.subevent3[i]);
+                    }
+                    break;
+                default:    // Null
+
+                    break;
             }
-            */
+        }
+
+        /// <summary>
+        /// 대기 시간
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        public IEnumerator WaitMethod(float t =0.1f)
+        {
+            is_Wait = true;
+            WaitForSeconds wait = new WaitForSeconds(t);
+            yield return wait;
+            is_Wait = false;
+            wait = null;
+        }
+
+        /// <summary>
+        /// 알람 표시
+        /// </summary>
+        /// <param name="msg">메세지 내용</param>
+        /// <returns></returns>
+        public IEnumerator AlermShow(string msg)
+        {
+            WaitForSeconds wait = new WaitForSeconds(2f);
+
+            while (is_Wait)
+            {
+                yield return null;
+            }
+
+            _Alerm.DOText(msg, 1.2f);
+
+            yield return wait;
+
+            _Alerm.text = "";
+
+            wait = null;
         }
     }
 }

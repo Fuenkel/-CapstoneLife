@@ -17,17 +17,26 @@ MonoBehaviour:
   _ChoiceMsg1: "\uC55E\uC73C\uB85C \uC0AC\uD68C\uC0DD\uD65C\uC5D0\uC120 \uC220\uC774
     \uAC70\uC758 \uD544\uC218\uC778\uB370 \uD544\uC694\uC545\uC774\uB77C\uACE0 \uC0DD\uAC01\uD574\uC694 "
   _NextChoice1Node:
-    _NextNode: {fileID: 11400000, guid: 9d8bb4613a7a2a34dafe1a8f2ac38344, type: 2}
+    _NextNode: {fileID: 11400000, guid: e4e4644cd5e4cc64dbefc894faa2e8d9, type: 2}
     _ChoiceNode: {fileID: 0}
     _flow: 0
+  subevent1:
+  - msgenum: 6
+    timer: 2
+    pos: {fileID: 0}
   _ChoiceMsg2: "\uC220 \uC88B\uC544\uD574\uC11C \uB531\uD788 \uC0DD\uAC01\uD560\uAC8C
     \uC5C6\uB124\uC694 "
   _NextChoice2Node:
-    _NextNode: {fileID: 11400000, guid: 9d8bb4613a7a2a34dafe1a8f2ac38344, type: 2}
+    _NextNode: {fileID: 11400000, guid: e4e4644cd5e4cc64dbefc894faa2e8d9, type: 2}
     _ChoiceNode: {fileID: 0}
     _flow: 0
+  subevent2:
+  - msgenum: 6
+    timer: 1
+    pos: {fileID: 0}
   _ChoiceMsg3: "\uC5EC\uB7EC\uAC00\uC9C0 \uC758\uBBF8\uB85C \uC2EB\uC2B5\uB2C8\uB2E4 "
   _NextChoice3Node:
-    _NextNode: {fileID: 11400000, guid: 9d8bb4613a7a2a34dafe1a8f2ac38344, type: 2}
+    _NextNode: {fileID: 11400000, guid: e4e4644cd5e4cc64dbefc894faa2e8d9, type: 2}
     _ChoiceNode: {fileID: 0}
     _flow: 0
+  subevent3: []

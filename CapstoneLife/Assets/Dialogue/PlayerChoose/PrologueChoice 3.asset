@@ -20,15 +20,24 @@ MonoBehaviour:
     _NextNode: {fileID: 11400000, guid: f4b9551b264f80f4cb89780224901366, type: 2}
     _ChoiceNode: {fileID: 0}
     _flow: 0
+  subevent1:
+  - msgenum: 6
+    timer: 2
+    pos: {fileID: 0}
   _ChoiceMsg2: "\uC544\uB1E8 \uBD99\uC784\uC131\uC774 \uC5C6\uC5B4\uC11C \uB9CE\uC774
     \uC0AC\uADC0\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4 "
   _NextChoice2Node:
     _NextNode: {fileID: 11400000, guid: f4b9551b264f80f4cb89780224901366, type: 2}
     _ChoiceNode: {fileID: 0}
     _flow: 0
+  subevent2: []
   _ChoiceMsg3: "\uB9CE\uC774 \uC788\uB2E4\uB294 \uAE30\uC900\uC774 \uB3C4\uB300\uCCB4
     \uBB54\uC9C0...2~3\uBA85\uB3C4 \uB9CE\uC740\uAC70 \uC544\uB2CC\uAC00\uC694? "
   _NextChoice3Node:
     _NextNode: {fileID: 11400000, guid: 456e5d7efee26fa41a81ec989746c562, type: 2}
     _ChoiceNode: {fileID: 0}
     _flow: 0
+  subevent3:
+  - msgenum: 6
+    timer: 1
+    pos: {fileID: 0}

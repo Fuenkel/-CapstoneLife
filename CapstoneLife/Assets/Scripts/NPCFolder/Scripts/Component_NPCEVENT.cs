@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using Sirenix.OdinInspector;
+using DG.Tweening;
 namespace HJ.NPC
 {
     public interface IEVENT
@@ -112,7 +113,21 @@ namespace HJ.NPC
                 HJ.Manager.DialogueManager.Instance.SetChoiceDialogue();
         }
     }
+    [Serializable, LabelText("페이드 아웃")]
+    public class EventPage_NPC3 : IEVENT
+    {
 
+        public float timer = 1f;
+        public void Play()
+        {
+            
+        }
+        public IEnumerator PlayCorutine()
+        {
+            GameManager.Instance._FadeOutImage.DOFade(1f, timer);
+            yield return null;
+        }
+    }
 
 
 }

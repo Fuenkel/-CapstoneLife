@@ -12,11 +12,18 @@ namespace HJ.Manager
         NIGHT,              //? 저녘
         DAWN                //? 새벽
     }
+    public enum WEATHERENUM
+    {
+        SUN,
+        RAIN,
+        SNOW
+    }
     public interface ITime
     {
         int Day { get; set; }
         int Time { get; set; }
         TIMEENUM TIMESET { get; set; }
+        WEATHERENUM WEATHERSET { get; set; }
         void SetDay(int n);
         
     }
@@ -29,6 +36,8 @@ namespace HJ.Manager
         [SerializeField, EnumPaging]
         private TIMEENUM _timenum;
 
+        [SerializeField, EnumPaging]
+        private WEATHERENUM _weathernum;
         // 시간초
         private int _time;
 
@@ -57,6 +66,7 @@ namespace HJ.Manager
         int ITime.Day { get => _day; set => _day = value; }
         public TIMEENUM TIMESET { get => _timenum; set =>_timenum = value; }
         public int Time { get => _time; set => _time = value; }
+        public WEATHERENUM WEATHERSET { get =>_weathernum; set => _weathernum = value; }
 
         /// <summary>
         /// 시간에 따른 하늘 상태 변경
@@ -108,6 +118,16 @@ namespace HJ.Manager
             SetDay(Itime.Time);
         }
 
+        /// <summary>
+        /// 시간 증가
+        /// </summary>
+        /// <param name="t">시간</param>
+        public void AddTime(int t)
+        {
+            Itime.Time += t;
+
+            CheckDay();
+        }
         #endregion
     }
 }

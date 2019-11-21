@@ -25,7 +25,8 @@ MonoBehaviour:
       \uC5B4\uB5BB\uAC8C \uC0DD\uAC01\uD558\uB098? "
     description_Image: {fileID: 0}
     descriptionTime: 1
+  subEvnet: 
   nextNODE:
     _NextNode: {fileID: 0}
-    _ChoiceNode: {fileID: 11400000, guid: d764e5b8a0a18ea4ca28ba745ef15052, type: 2}
+    _ChoiceNode: {fileID: 11400000, guid: 6f8cfc64cd85ca744b31bf3369e584a0, type: 2}
     _flow: 1

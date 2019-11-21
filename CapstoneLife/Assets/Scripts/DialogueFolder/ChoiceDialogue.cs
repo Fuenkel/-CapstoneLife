@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
-
+using HJ.Manager;
 
 namespace HJ.Dialogue
 {
@@ -23,16 +23,16 @@ namespace HJ.Dialogue
         public string _ChoiceMsg1;
         [LabelText("이동할 DB1"),BoxGroup("Setting")]
         public FlowNode _NextChoice1Node;
-        [LabelText("이벤트 1")]
-        public string subevent1;
+        [LabelText("이벤트 1"),SerializeField]
+        public MessageCommend[] subevent1;
 
         [Title("")]
         [LabelText("선택 메세지2"),BoxGroup("Setting")]
         public string _ChoiceMsg2;
         [LabelText("이동할 DB2"),BoxGroup("Setting")]
         public FlowNode _NextChoice2Node;
-        [LabelText("이벤트 2")]
-        public string subevent2;
+        [LabelText("이벤트 2"), SerializeField]
+        public MessageCommend[] subevent2;
 
         [Title("")]
         [LabelText("선택 메세지3"),BoxGroup("Setting")]
@@ -40,8 +40,16 @@ namespace HJ.Dialogue
 
         [LabelText("이동할 DB3"),BoxGroup("Setting")]
         public FlowNode _NextChoice3Node;
-        [LabelText("이벤트 3")]
-        public string subevent3;
+        [LabelText("이벤트 3"), SerializeField]
+        public MessageCommend[] subevent3;
+
+        [Button("이벤트 모두 초기화")]
+        public void OnClearButton()
+        {
+            subevent1 = null;
+            subevent2 = null;
+            subevent3 = null;
+        }
 
         public List<string> ChoiceMsgList{
             get{

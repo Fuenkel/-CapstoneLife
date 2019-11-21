@@ -8,11 +8,12 @@ using HJ.Manager;
 public class GameLoding : MonoBehaviour
 {
     public Slider LodingSlider;
-    public Text textbox;
+    //public Text textbox;
 
     public MapManager manager;
-
+    public GameObject npcobject;
     public GameObject tutorial;
+    public GameObject lodingText;
 
     //? 씬들 로딩
     string[] sceneName =
@@ -30,6 +31,7 @@ public class GameLoding : MonoBehaviour
 
     void InitGame()
     {
+        StartCoroutine( EventPageManager.Instance.FadeOut(0.5f));
         StartCoroutine(Loading());
 
 
@@ -49,7 +51,7 @@ public class GameLoding : MonoBehaviour
                 LodingSlider.value = async.progress;
             }
             SceneManager.SetActiveScene(SceneManager.GetSceneByName(sceneName[i]));
-            textbox.text += string.Format("{0} Scene 로딩 완료\n",SceneManager.GetActiveScene().name);
+            //textbox.text += string.Format("{0} Scene 로딩 완료\n",SceneManager.GetActiveScene().name);
         }
         yield return new WaitForSeconds(2f);
         GameObject[] obj = GameObject.FindGameObjectsWithTag("MapID");
@@ -58,15 +60,20 @@ public class GameLoding : MonoBehaviour
             manager.mapBoundBoxCollider[i] = obj[i].GetComponent<BoxCollider2D>();
 
         LodingSlider.gameObject.SetActive(false);
-
+        lodingText.SetActive(false);
         // Main Scene 설정
         SceneManager.SetActiveScene(SceneManager.GetSceneByName("02.MainMap"));
 
         if (!PlayerState.is_tutorial)
         {
-            tutorial.gameObject.GetComponent<HJ.NPC.Component_NPCEVENT>().PlayEvent();
+            HJ.NPC.Component_NPCEVENT[] n = tutorial.gameObject.GetComponents<HJ.NPC.Component_NPCEVENT>();
+            for(int i = 0; i < n.Length; i++)
+            {
+                n[i].PlayEvent();
+            }
         }
-        
+
+        npcobject.SetActive(true);
 
         Destroy(gameObject, 10f);
         

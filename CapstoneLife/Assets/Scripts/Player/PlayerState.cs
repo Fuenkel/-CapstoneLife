@@ -13,6 +13,7 @@ public class PlayerState : Singleton<PlayerState>
     private uint love_stat;      //? 사량
     private uint money;              //? 돈
 
+
     private uint current_MapID;
     private uint current_hp;             //? 현재건강
     private uint max_hp;                  //? 최대 건강력
@@ -22,17 +23,54 @@ public class PlayerState : Singleton<PlayerState>
 
     [Title("UI Setting")]
     public GameObject ui_statusBox;         //? 스테이터스 부모 창
-    public Text[] ui_stateText = new Text[7];                 //? 스테이스 능력 텍스트 상자
+    public Text[] ui_stateText = new Text[4];                 //? 스테이스 능력 텍스트 상자
+
+
+    //? UI 창
+    public bool is_true = false;
 
     public enum STATUSENUM
     {
-        NONE = 0,Study, Social, Love, Money, MapID, MaxHP, CurrHP
+        NONE = 0,Study =1, Social, Love, Money, MapID, MaxHP, CurrHP
     }
 
     public STATUSENUM statusenum;
 
     public static bool is_tutorial;         //? 튜토리얼을 끝냈는가?
     #endregion
+
+
+    /// <summary>
+    /// 눙력치
+    /// </summary>
+    /// <param name="t">요소</param>
+    /// <param name="n">값</param>
+    public void SettingStatus(STATUSENUM t, uint n)
+    {
+        switch(t)
+        {
+            case 0:
+                break;
+            case STATUSENUM.Study:
+                Study = n;
+                break;
+            case STATUSENUM.Social:
+                Social = n;
+                break;
+            case STATUSENUM.Love:
+                Love = n;
+                break;
+            case STATUSENUM.Money:
+                AddMoney = n;
+                break;
+            case STATUSENUM.CurrHP:
+                CurrentHpADD = n;
+                break;
+
+        }
+    }
+
+
     #region 프로퍼티
     public uint Study
     {
@@ -47,7 +85,7 @@ public class PlayerState : Singleton<PlayerState>
     public uint Love
     {
         get { return love_stat; }
-        set { love_stat += value; }
+        set { love_stat += value;}
     }
     /// <summary>
     /// 돈 증가
@@ -117,12 +155,27 @@ public class PlayerState : Singleton<PlayerState>
 
     private void Awake()
     {
-            
+       
     }
 
-    private void Start()
+    private void Update()
     {
+        if (is_true)
+        {
+            ui_stateText[0].text = string.Format("{0}", Study);
+            ui_stateText[1].text = string.Format("{0}", Social);
+            ui_stateText[2].text = string.Format("{0}", Love);
+            ui_stateText[3].text = string.Format("{0}", money);
+        }
         
+    }
+
+    public void MenuButtonClick()
+    {
+        if (HJ.Manager.DialogueManager.is_Msg) return;
+        is_true = !is_true;
+        if (is_true) ui_statusBox.SetActive(true);
+        else ui_statusBox.SetActive(false);
     }
 
     void InitGame()

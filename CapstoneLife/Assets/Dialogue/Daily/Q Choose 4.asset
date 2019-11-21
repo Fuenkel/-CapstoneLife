@@ -19,13 +19,19 @@ MonoBehaviour:
     _NextNode: {fileID: 11400000, guid: 571ac9cafbaccdd4aa43a4a0d49e23d2, type: 2}
     _ChoiceNode: {fileID: 0}
     _flow: 0
+  subevent1: []
   _ChoiceMsg2: "\uACE0\uC6D0\uC9C0\uBC29"
   _NextChoice2Node:
     _NextNode: {fileID: 11400000, guid: 571ac9cafbaccdd4aa43a4a0d49e23d2, type: 2}
     _ChoiceNode: {fileID: 0}
     _flow: 0
+  subevent2: []
   _ChoiceMsg3: "\uC0AC\uB9C9"
   _NextChoice3Node:
     _NextNode: {fileID: 11400000, guid: 4ea38b2ad3d4ef241be8dd152dbd8e67, type: 2}
     _ChoiceNode: {fileID: 0}
     _flow: 0
+  subevent3:
+  - msgenum: 5
+    timer: 1
+    pos: {fileID: 0}

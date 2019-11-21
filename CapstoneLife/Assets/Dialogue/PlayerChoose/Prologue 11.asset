@@ -39,6 +39,10 @@ MonoBehaviour:
       \uC2DC\uC791\uB41C\uB2E4 "
     description_Image: {fileID: 0}
     descriptionTime: 1
+  subEvnet:
+  - msgenum: 1
+    timer: 1
+    pos: {fileID: 0}
   nextNODE:
     _NextNode: {fileID: 0}
     _ChoiceNode: {fileID: 0}

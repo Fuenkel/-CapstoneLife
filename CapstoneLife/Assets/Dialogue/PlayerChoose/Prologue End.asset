@@ -23,6 +23,10 @@ MonoBehaviour:
       \uC548\uB418\uC5C8\uC5B4~ "
     description_Image: {fileID: 0}
     descriptionTime: 1
+  subEvnet:
+  - msgenum: 1
+    timer: 1
+    pos: {fileID: 0}
   nextNODE:
     _NextNode: {fileID: 0}
     _ChoiceNode: {fileID: 0}

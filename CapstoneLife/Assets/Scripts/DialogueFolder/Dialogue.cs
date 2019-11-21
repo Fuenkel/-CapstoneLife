@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
-
+using HJ.Manager;
 namespace HJ.Dialogue
 {
     [CreateAssetMenu(fileName = "New Dialogue", menuName = "Dialogue/New Dialogue")]
@@ -21,10 +21,14 @@ namespace HJ.Dialogue
         [LabelText("대화내용"),BoxGroup("Setting")]
         public Message[] setting;
 
-        [Title("이벤트"),LabelText("일반적 이벤트")]
-        public string subEvnet;
+        [Title("이벤트"),LabelText("일반적 이벤트"),SerializeField]
+        public MessageCommend[] subEvnet;
         
-
+        [Button("이벤트 초기화")]
+        private void OnClearButton()
+        {
+            subEvnet = null;
+        }
 
         [LabelText("다음 대화 내용"),BoxGroup("Setting")]
         public FlowNode nextNODE = new FlowNode();
